@@ -2,30 +2,86 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>FormSubmit | Axios using reCAPTCHA v2</title>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <title>FormSubmit | jQuery</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>   
   </head>
   <body>
-    <div class="g-recaptcha" data-sitekey="6LfiA6gcAAAAAMUK8zqzVEO36AkNEC6zvhgGJQC9"></div>
-    <button id="send-button" type="button">Send</button>
-    <script>
-      document
-        .getElementById("send-button")
-        .addEventListener("click", function () {
-          axios
-            .post("https://formsubmit.co/ajax/tilman.becker@gmail.com}", {
-              name: "FormSubmit",
-              message: "Hello, World",
-              "g-recaptcha-response": grecaptcha.getResponse(),
-            })
-            .then(function (response) {
-              console.log(response);
-            })
-            .catch(function (response) {
-              console.error(response);
-            });
-        });
-    </script>
+ <script type="text/javascript">
+$("#my_form").submit(function(event){
+	event.preventDefault(); //prevent default action 
+	var proceed = true;
+	var form = this;
+	
+	//simple validation at client's end
+	//loop through each field and we simply change border color to red for invalid fields		
+	$(form).find(':required').each(function(){
+		$(this).css('border-color',''); 
+		if(!$.trim($(this).val())){ //if this field is empty 
+			$(this).css('border-color','red'); //change border color to red   
+			proceed = false; //set do not proceed flag
+		}
+		//check invalid email
+		var email_reg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/; 
+		if($(this).attr("type")=="email" && !email_reg.test($.trim($(this).val()))){
+			$(this).css('border-color','red'); //change border color to red   
+			proceed = false; //set do not proceed flag				
+		}	
+
+	}).keyup(function() { //reset previously set border colors on .keyup()
+		$(this).css('border-color',''); 
+	}).change(function() {  //for select box
+		$(this).css('border-color',''); 
+	});	
+	
+	if(proceed){ //everything looks good! proceed...
+		//get input field values data to be sent to server
+		var post_url = $(this).attr("action"); //get form action url
+		var request_method = $(this).attr("method"); //get form GET/POST method
+		var form_data = $(this).serialize(); //Encode form elements for submission
+		
+		//Ajax post data to server
+		$.ajax({
+    method: 'POST',
+    url: 'https://formsubmit.co/ajax/tilman.becker@gmail.com',
+    dataType: 'json',
+    accepts: 'application/json',
+    data: form_data,
+    success: (data) => console.log(data),
+    error: (err) => console.log(err)
+});
+	}
+});
+</script>
+    <div class="form-style">
+    <div class="form-style-heading">Please Contact Us</div>
+    <div id="contact_results"></div>
+    <div id="contact_body">
+    <form id="my_form" novalidate>
+        <label><span>Name <span class="required">*</span></span>
+            <input type="text" name="user_name" required class="input-field"/>
+        </label>
+        <label><span>Email <span class="required">*</span></span>
+            <input type="email" name="user_email" required class="input-field"/>
+        </label>
+        <label><span>Phone</span>
+            <input type="text" name="country_code" maxlength="4" placeholder="+91" required class="tel-number-field"/>—<input type="text" name="phone_number" maxlength="15" class="tel-number-field long" required/>
+        </label>
+            <label for="subject"><span>Regarding</span>
+            <select name="subject" class="select-field" required>
+            <option value="">---- Select ----</option>
+            <option value="General Question">General Question</option>
+            <option value="Advertise">Advertisement</option>
+            <option value="Partnership">Partnership Oppertunity</option>
+            </select>
+        </label>
+        <label for="field5"><span>Message <span class="required">*</span></span>
+            <textarea name="message" id="message" class="textarea-field" required></textarea>
+        </label>
+        <label>
+            <span> </span><input type="submit" id="submit_btn" value="Submit" action="JavaScript:submit()" />
+        </label>
+     </form>
+    </div>
+</div>
   </body>
 </html>
