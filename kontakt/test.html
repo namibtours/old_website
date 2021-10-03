@@ -15,6 +15,7 @@
         .addEventListener("click", function () {
           axios
             .post("https://formsubmit.co/ajax/b298c76b70ef5f65020472ab21d5635b}", {
+              name: "FormSubmit",
               message: "Hello, World",
               "g-recaptcha-response": grecaptcha.getResponse(),
             })
